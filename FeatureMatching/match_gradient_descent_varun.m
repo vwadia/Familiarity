@@ -9,17 +9,17 @@ clear
 [~, host] = system('hostname');
 if strcmp(host(1:end-1), 'DWA644201')
     atCedars = 1;
-    famPath = 'C:\Users\wadiav\Documents\PYTHON\FaceFamiliarity';
+    famPath = 'C:\Users\wadiav\Documents\PYTHON\Familiarity';
     diskPath = 'G:\SUAnalysis';
     
 elseif strcmp(host(1:end-1), 'DESKTOP-LJHLIED')
     atCedars = 0;
-    famPath = 'C:\Users\varunwadia\Documents\PYTHON\FaceFamiliarity';
+    famPath = 'C:\Users\varunwadia\Documents\PYTHON\Familiarity';
     diskPath = 'G:\SUAnalysis';
     
 else % mac
     atCedars = 0;
-    famPath = '/Users/vwadia/Documents/PYTHON/FaceFamiliarity';
+    famPath = '/Users/vwadia/Documents/PYTHON/Familiarity';
     diskPath = '/Volumes/T7/SUAnalysis';
     
 end
@@ -29,7 +29,8 @@ matchPath = [famPath filesep 'FeatureMatching'];
 % patientID = 'P87CS';
 % patientID = 'P86CS';
 % patientID = 'P92CS';
-patientID = 'P98CS';
+% patientID = 'P98CS';
+patientID = 'P99CS';
 
 outPath = [matchPath filesep patientID];
 if ~exist(outPath, 'dir')
@@ -60,8 +61,12 @@ params = [params(unfam_ind, :); p_fam];
 params = bsxfun(@rdivide, params, std(params)); % normalize features
 
 subsampleims = false;
-refineSearch = true; % can use to find matches for recall Ims - vwadia July 2024
-recallIms = [13 15 18 24 25 38 40 45 47 58 64 83]; % chosen manually per patient
+refineSearch = false; % can use to find matches for recall Ims - vwadia July 2024
+if strcmp(patientID, 'P98CS')
+    recallIms = [13 15 18 24 25 38 40 45 47 58 64 83]; % chosen manually per patient
+elseif strcmp(patientID, 'P99CS')
+    % recallIms = []; 
+end
 %% sub sample params
 if subsampleims || refineSearch
     if ~refineSearch
@@ -238,20 +243,20 @@ end
 
 %% 
 
-path = 'G:\SUAnalysis\Fam_Task\P98CS\FamReScreenRecall_Session_1_20240803\match_by_grad_Nfam100_Nunfam120_1000';
-
-ims = Utilities.readInFiles(path);
-ims = ims(1:100); % fam only
-
-
-for i = 1:length(ims)
-    fn = ims(i).name;
-    newN = 3000 + str2num(fn(1:end-4))
-    movefile([ims(i).folder filesep ims(i).name], [ims(i).folder filesep num2str(newN) '.jpg'])
-
-end
-
-
+% path = 'G:\SUAnalysis\Fam_Task\P98CS\FamReScreenRecall_Session_1_20240803\match_by_grad_Nfam100_Nunfam120_1000';
+% 
+% ims = Utilities.readInFiles(path);
+% ims = ims(1:100); % fam only
+% 
+% 
+% for i = 1:length(ims)
+%     fn = ims(i).name;
+%     newN = 3000 + str2num(fn(1:end-4))
+%     movefile([ims(i).folder filesep ims(i).name], [ims(i).folder filesep num2str(newN) '.jpg'])
+% 
+% end
+% 
+% 
 
 
 

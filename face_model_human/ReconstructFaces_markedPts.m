@@ -17,22 +17,25 @@ model = AAM_Model(model_data); % instance of class AAM_model
 
 %% read in coords
 
-useAligned = false;
+useAligned = true;
 
 if useAligned
     
 %     imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'SingleIm_Aligned'];
 %     imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'CelebFaces_pt_Varun_Aligned_10'];
-    imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P86CS' filesep 'FamFaces_Pt_P86CS_Aligned'];
+    % imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P86CS' filesep 'FamFaces_Pt_P86CS_Aligned'];
+    imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P99CS' filesep 'ExtraFaces_Processed'];
     ims = Utilities.readInFiles(imPath);
     
 %     ptsPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'SingleIm_markedPts_Aligned'];
 %     ptsPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'markedPts_pt_Varun_Aligned_10'];
-    ptsPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P86CS' filesep 'markedPts_pt_P86CS'];
+    % ptsPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P86CS' filesep 'markedPts_pt_P86CS'];
+    ptsPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P99CS' filesep 'markedPts_pt_P99CS'];
     m_pts = Utilities.readInFiles(ptsPath, 'mat');   
     
     % for SA images
-    outPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P86CS' filesep 'SA_Aligned'];
+    % outPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P86CS' filesep 'SA_Aligned'];
+    outPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P86CS' filesep 'SA_P99CS_Processed'];
 else
     
 %     imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'SingleIm'];
@@ -101,7 +104,8 @@ for i = 1:length(m_pts)
 end
 
 if toSave
-    save([famPath filesep 'FeatureMatching' filesep 'params_fam_P98_100d.mat'], 'p_fam');
+    save([famPath filesep 'FeatureMatching' filesep 'params_fam_P99_100d_addOns.mat'], 'p_fam');
+    % save([famPath filesep 'FeatureMatching' filesep 'params_fam_P98_100d.mat'], 'p_fam');
     % save([famPath filesep 'FeatureMatching' filesep 'params_fam_P92_100d.mat'], 'p_fam');
 end
 
