@@ -24,13 +24,15 @@ if useAligned
 %     imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'SingleIm_Aligned'];
 %     imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'CelebFaces_pt_Varun_Aligned_10'];
     % imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P86CS' filesep 'FamFaces_Pt_P86CS_Aligned'];
-    imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P99CS' filesep 'ExtraFaces_Processed'];
+    % imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P99CS' filesep 'ExtraFaces_Processed'];
+    imPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P99CS' filesep 'Im'];
     ims = Utilities.readInFiles(imPath);
     
 %     ptsPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'SingleIm_markedPts_Aligned'];
 %     ptsPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'markedPts_pt_Varun_Aligned_10'];
     % ptsPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P86CS' filesep 'markedPts_pt_P86CS'];
-    ptsPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P99CS' filesep 'markedPts_pt_P99CS'];
+    % ptsPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P99CS' filesep 'markedPts_pt_P99CS'];
+    ptsPath = [famPath filesep 'BackgroundRemoval_SegAny' filesep 'P99CS' filesep 'Im_Pts'];
     m_pts = Utilities.readInFiles(ptsPath, 'mat');   
     
     % for SA images

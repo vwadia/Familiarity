@@ -61,12 +61,15 @@ params = [params(unfam_ind, :); p_fam];
 params = bsxfun(@rdivide, params, std(params)); % normalize features
 
 subsampleims = false;
-refineSearch = false; % can use to find matches for recall Ims - vwadia July 2024
 if strcmp(patientID, 'P98CS')
     recallIms = [13 15 18 24 25 38 40 45 47 58 64 83]; % chosen manually per patient
 elseif strcmp(patientID, 'P99CS')
-    % recallIms = []; 
+    recallIms = [1 2 10 27 38 39 75 87 92 93 98 99]; % these are wrt the fam_stim for that patient not the big set
 end
+if exist('recallIms', 'var')
+    refineSearch = true; % can use to find matches for recall Ims - vwadia July 2024
+end
+
 %% sub sample params
 if subsampleims || refineSearch
     if ~refineSearch
@@ -205,19 +208,22 @@ outPath = [diskPath filesep 'Fam_Task' filesep patientID filesep output_file_nam
 if ~exist(outPath)
     mkdir(outPath)
 end
-
+%%
 % copy over the images - unfamiliar first
 unfamImgs = all_unfamImgs(unfamIm_inds);
 startnum = 5000;
 for uI = 1:length(unfamImgs)
     fnum = startnum+uI;
+    newfnum = str2num(unfamImgs(uI).name(1:end-4))+startnum;
     fname = unfamImgs(uI).name;
     dotpos = strfind(unfamImgs(uI).name, '.');
     suffix = fname(dotpos+1:end);
     if ~exist('recallIms', 'var')
-        copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep num2str(fnum) '.' suffix]);
+        copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep num2str(newfnum) '.' suffix]);
+        % copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep num2str(fnum) '.' suffix]);
     else
-        copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep unfamImgs(uI).name]); % keep the names the same
+        copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep num2str(newfnum) '.' suffix]); % keep the names the same
+        % copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep unfamImgs(uI).name]); % keep the names the same
 
     end
     
@@ -225,7 +231,7 @@ end
 %%
 if ~exist('recallIms', 'var')
     % familiar second
-    useoffset = false;
+    useoffset = false; % inthis big set these are already offset
     famImgs = all_famImgs(famIm_inds - total_unfam_imgs);
 
     for fI = 1:length(famImgs)
