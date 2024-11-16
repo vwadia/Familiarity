@@ -19,7 +19,7 @@ elseif strcmp(host(1:end-1), 'DESKTOP-LJHLIED')
     
 else % mac
     atCedars = 0;
-    famPath = '/Users/vwadia/Documents/PYTHON/Familiarity';
+    famPath = '/Users/varunwadia/Documents/Familiarity';
     diskPath = '/Volumes/T7/SUAnalysis';
     
 end
@@ -30,7 +30,8 @@ matchPath = [famPath filesep 'FeatureMatching'];
 % patientID = 'P86CS';
 % patientID = 'P92CS';
 % patientID = 'P98CS';
-patientID = 'P99CS';
+% patientID = 'P99CS';
+patientID = 'P103CS';
 
 outPath = [matchPath filesep patientID];
 if ~exist(outPath, 'dir')
@@ -42,7 +43,10 @@ end
 % dim_ind = [1:60]; 
 dim_ind = [1:100];
 
+
 % dim_ind = [1:10 21:30]; % his fam SA features had only 10 shape and 10 app dims
+
+forRecall = false; 
 
 %% faces
 load([famPath filesep 'FeatureMatching' filesep 'params_1k_100d.mat'])
@@ -50,7 +54,7 @@ load([famPath filesep 'FeatureMatching' filesep 'params_1k_100d.mat'])
 % load([famPath filesep 'FeatureMatching' filesep 'params_fam_P87_100d.mat'])
 % load([famPath filesep 'FeatureMatching' filesep 'params_fam_P87_2_100d.mat'])
 % load([famPath filesep 'FeatureMatching' filesep 'params_fam_P86_100d.mat'])
-load([famPath filesep 'FeatureMatching' filesep 'params_fam_' patientID(1:3) '_100d.mat'])
+load([famPath filesep 'FeatureMatching' filesep 'params_fam_' patientID(1:end-2) '_100d.mat'])
 
 unfam_ind = 1:1000;
 allfam_ind = 1001:(1000+size(p_fam, 1));
@@ -65,9 +69,13 @@ if strcmp(patientID, 'P98CS')
     recallIms = [13 15 18 24 25 38 40 45 47 58 64 83]; % chosen manually per patient
 elseif strcmp(patientID, 'P99CS')
     recallIms = [1 2 10 27 38 39 75 87 92 93 98 99]; % these are wrt the fam_stim for that patient not the big set
+elseif strcmp(patientID, 'P103CS')
+    recallIms = [];
 end
-if exist('recallIms', 'var')
+if exist('recallIms', 'var') && forRecall
     refineSearch = true; % can use to find matches for recall Ims - vwadia July 2024
+else
+    refineSearch = false;
 end
 
 %% sub sample params
@@ -157,7 +165,7 @@ toc
 
 ind_unfam_sub = find(x&x_unfam);
 ind_fam_sub = find(x&x_fam);
-if exist("recallIms", 'var')
+if exist("recallIms", 'var') && forRecall
     output_file_name = sprintf('ForRecall_match_by_grad_Nfam%d_Nunfam%d_%d.mat', n_fam, n_unfam, length(unfam_ind));
 else
     output_file_name = sprintf('match_by_grad_Nfam%d_Nunfam%d_%d.mat', n_fam, n_unfam, length(unfam_ind));
@@ -229,7 +237,8 @@ for uI = 1:length(unfamImgs)
     
 end
 %%
-if ~exist('recallIms', 'var')
+if ~forRecall
+% if ~exist('recallIms', 'var')
     % familiar second
     useoffset = false; % inthis big set these are already offset
     famImgs = all_famImgs(famIm_inds - total_unfam_imgs);
