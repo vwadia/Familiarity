@@ -46,7 +46,7 @@ dim_ind = [1:100];
 
 % dim_ind = [1:10 21:30]; % his fam SA features had only 10 shape and 10 app dims
 
-forRecall = false; 
+forRecall = true; 
 
 %% faces
 load([famPath filesep 'FeatureMatching' filesep 'params_1k_100d.mat'])
@@ -70,7 +70,7 @@ if strcmp(patientID, 'P98CS')
 elseif strcmp(patientID, 'P99CS')
     recallIms = [1 2 10 27 38 39 75 87 92 93 98 99]; % these are wrt the fam_stim for that patient not the big set
 elseif strcmp(patientID, 'P103CS')
-    recallIms = [];
+    recallIms = [1 3 12 16 21 23 27 45 50 67 71 93]; % these are wrt the fam_stim for that patient not the big set
 end
 if exist('recallIms', 'var') && forRecall
     refineSearch = true; % can use to find matches for recall Ims - vwadia July 2024
