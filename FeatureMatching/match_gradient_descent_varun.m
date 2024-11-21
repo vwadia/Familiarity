@@ -271,10 +271,16 @@ end
 % 
 % end
 % 
-% 
 
+% tacking on new features to big set
 
+run G:\SUAnalysis\setDiskPaths 
 
+baseDir = pwd;
 
+p1 = load([famPath filesep 'BigSet_AllFamStim_noreps' filesep 'params_fam_bigsetFamNoReps_100d.mat']);
+p2 = load([baseDir filesep 'params_fam_P102_100d_addOns.mat']);
 
+p_fam = [p1.p_fam; p2.p_fam];
 
+save([famPath filesep 'BigSet_AllFamStim_noreps' filesep 'params_fam_bigsetFamNoReps_100d.mat'], 'p_fam')
