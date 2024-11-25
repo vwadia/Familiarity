@@ -31,7 +31,8 @@ matchPath = [famPath filesep 'FeatureMatching'];
 % patientID = 'P92CS';
 % patientID = 'P98CS';
 % patientID = 'P99CS';
-patientID = 'P103CS';
+% patientID = 'P103CS';
+patientID = 'P102CS';
 
 outPath = [matchPath filesep patientID];
 if ~exist(outPath, 'dir')
@@ -49,13 +50,14 @@ dim_ind = [1:100];
 forRecall = true; 
 
 %% faces
-load([famPath filesep 'FeatureMatching' filesep 'params_1k_100d.mat'])
+load([famPath filesep 'FeatureMatching' filesep 'params_1k_100d.mat']) % this has 1k unfam faces plus 35 fam faces liang used, 1035 x 100
 % load([famPath filesep 'FeatureMatching' filesep 'params_fam_100d.mat'])
 % load([famPath filesep 'FeatureMatching' filesep 'params_fam_P87_100d.mat'])
 % load([famPath filesep 'FeatureMatching' filesep 'params_fam_P87_2_100d.mat'])
 % load([famPath filesep 'FeatureMatching' filesep 'params_fam_P86_100d.mat'])
 load([famPath filesep 'FeatureMatching' filesep 'params_fam_' patientID(1:end-2) '_100d.mat'])
 
+% fam and unfam indices
 unfam_ind = 1:1000;
 allfam_ind = 1001:(1000+size(p_fam, 1));
 
@@ -71,7 +73,10 @@ elseif strcmp(patientID, 'P99CS')
     recallIms = [1 2 10 27 38 39 75 87 92 93 98 99]; % these are wrt the fam_stim for that patient not the big set
 elseif strcmp(patientID, 'P103CS')
     recallIms = [1 3 12 16 21 23 27 45 50 67 71 93]; % these are wrt the fam_stim for that patient not the big set
+elseif strcmp(patientID, 'P102CS')
+    recallIms = [ 10 18 19 22 23 28 37 53 58 64 95 98]; % these are wrt the fam_stim for that patient not the big set
 end
+
 if exist('recallIms', 'var') && forRecall
     refineSearch = true; % can use to find matches for recall Ims - vwadia July 2024
 else
@@ -84,7 +89,8 @@ if subsampleims || refineSearch
         sub_sample = sort(randi(length(unfam_ind), [1 500])); % NEED TO FUCKING SAVE THESE INDICES vwadia May2024
     else
         % load('match_by_grad_Nfam60_Nunfam184_1000.mat')
-        load([outPath filesep 'match_by_grad_Nfam100_Nunfam120_1000.mat'])
+        % load([outPath filesep 'match_by_grad_Nfam100_Nunfam120_1000.mat'])
+        load([outPath filesep 'match_by_grad_Nfam100_Nunfam100_1000.mat'])
         p_fam = p_fam(recallIms, :);
         allfam_ind = recallIms+length(unfam_ind);
         sub_sample = ind_unfam_sub;
@@ -94,6 +100,7 @@ if subsampleims || refineSearch
     unfam_ind = sub_sample';
     % allfam_ind = unfam_ind+1:(unfam_ind+size(p_fam, 1));
     
+    % resetting indices - should I reset unfam ind?
     params = params([unfam_ind allfam_ind], :);
     allfam_ind = length(unfam_ind)+1:length(unfam_ind)+size(p_fam, 1);
 end
@@ -131,9 +138,9 @@ for i = 1:n
  
     % estimate grad
     parfor j=1:n_stim 
-%     for j=1:n_stim
+    % for j=1:n_stim
         xd = x;
-        xd(j) = ~xd(j);
+        xd(j) = ~xd(j); % convert xd(j) from 1 to 0
         grad(j) = cost_fun( params, xd, x_fam, x_unfam ) - cost;
     end
     
@@ -142,7 +149,8 @@ for i = 1:n
     end
     [grad_min, ind] = min(grad);
     
-    if grad_min<0 && n_unfam>(1.2*n_fam) % give a lil extra for repetitions
+    % if grad_min<0 && n_unfam>(1.2*n_fam) % give a lil extra for repetitions
+    if grad_min<0 && n_unfam>(1*n_fam) % give a lil extra for repetitions
         x(ind) = ~x(ind);
         cost = cost + grad(ind);
         
@@ -180,15 +188,22 @@ total_unfam_imgs = 1000;
 if exist('sub_sample', 'var') 
     if exist("recallIms", 'var')
         total_unfam_imgs = length(sub_sample);
+
+        % these are always at the end
+        famIm_inds = ind_fam_sub;
+
+      
     else
         total_unfam_imgs = 1000 - length(sub_sample);
+
+        % these are always at the end - why did I do this?
+        famIm_inds = ind_fam_sub + total_unfam_imgs;
+
     end
-    % these are always at the end
-    famIm_inds = ind_fam_sub + total_unfam_imgs;
-    
-    % actually important indices
+    % unfam indices relative to the big set
     unfamIm_inds = unfam_ind(ind_unfam_sub);
 
+  
 else
     
     % these are always at the end
@@ -226,22 +241,30 @@ for uI = 1:length(unfamImgs)
     fname = unfamImgs(uI).name;
     dotpos = strfind(unfamImgs(uI).name, '.');
     suffix = fname(dotpos+1:end);
-    if ~exist('recallIms', 'var')
-        copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep num2str(newfnum) '.' suffix]);
-        % copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep num2str(fnum) '.' suffix]);
-    else
-        copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep num2str(newfnum) '.' suffix]); % keep the names the same
-        % copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep unfamImgs(uI).name]); % keep the names the same
 
-    end
+    copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep num2str(newfnum) '.' suffix]);
+
+    % if ~exist('recallIms', 'var')
+    %     copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep num2str(newfnum) '.' suffix]);
+    %     % copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep num2str(fnum) '.' suffix]);
+    % else
+    %     copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep num2str(newfnum) '.' suffix]); % keep the names the same
+    %     % copyfile([unfamImgs(uI).folder filesep unfamImgs(uI).name], [outPath filesep unfamImgs(uI).name]); % keep the names the same
+    % 
+    % end
     
 end
 %%
-if ~forRecall
+% if ~forRecall
 % if ~exist('recallIms', 'var')
     % familiar second
     useoffset = false; % inthis big set these are already offset
-    famImgs = all_famImgs(famIm_inds - total_unfam_imgs);
+
+    if exist('recallIms') && forRecall
+        famImgs = all_famImgs(recallIms);
+    else
+        famImgs = all_famImgs(famIm_inds - total_unfam_imgs);
+    end
 
     for fI = 1:length(famImgs)
         fn = famImgs(fI).name;
@@ -254,7 +277,7 @@ if ~forRecall
         copyfile([famImgs(fI).folder filesep famImgs(fI).name], [outPath filesep fInd '.jpg']);
 
     end
-end
+% end
 
 %% 
 
@@ -274,13 +297,13 @@ end
 
 % tacking on new features to big set
 
-run G:\SUAnalysis\setDiskPaths 
-
-baseDir = pwd;
-
-p1 = load([famPath filesep 'BigSet_AllFamStim_noreps' filesep 'params_fam_bigsetFamNoReps_100d.mat']);
-p2 = load([baseDir filesep 'params_fam_P102_100d_addOns.mat']);
-
-p_fam = [p1.p_fam; p2.p_fam];
-
-save([famPath filesep 'BigSet_AllFamStim_noreps' filesep 'params_fam_bigsetFamNoReps_100d.mat'], 'p_fam')
+% run G:\SUAnalysis\setDiskPaths 
+% 
+% baseDir = pwd;
+% 
+% p1 = load([famPath filesep 'BigSet_AllFamStim_noreps' filesep 'params_fam_bigsetFamNoReps_100d.mat']);
+% p2 = load([baseDir filesep 'params_fam_P102_100d_addOns.mat']);
+% 
+% p_fam = [p1.p_fam; p2.p_fam];
+% 
+% save([famPath filesep 'BigSet_AllFamStim_noreps' filesep 'params_fam_bigsetFamNoReps_100d.mat'], 'p_fam')
